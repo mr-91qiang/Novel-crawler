@@ -36,9 +36,10 @@ func GetRes(url string, bookName string) {
 		log.Fatal(err)
 	}
 	find := doc.Find("#content")
-	html := find.Text()
-	html = strings.Replace(html, "。", "。\n", -1)
-	title := doc.Find(".title").Text()
+	html, _ := find.Html()
+	html = strings.Replace(html, "</p>", "\n", -1)
+	html = strings.Replace(html, "<p>", "\t", -1)
+	title := "\t" + doc.Find(".title").Text() + "\n"
 	nextURL, is := doc.Find("#next_url").Attr("href")
 
 	if !is {
@@ -51,12 +52,12 @@ func GetRes(url string, bookName string) {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	file.WriteAt([]byte(title), seek)
+	file.WriteAt([]byte("\t"+title), seek)
 	seek, err = file.Seek(0, 2)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	file.WriteAt([]byte(html), seek)
+	file.WriteAt([]byte("\t"+html), seek)
 	nextURL = "https://www.changyeyuhuo.com" + nextURL
 	GetRes(nextURL, bookName)
 }
